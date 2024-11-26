@@ -16,9 +16,11 @@ league = League(league_id=LEAGUE_ID, year=SEASON, espn_s2=ESPN_S2, swid=SWID)
 def fetch_standings():
     standings = []
     for team in league.teams:
+        # Extract owner names from the list of dictionaries
+        owners = [owner.get('firstName', 'Unknown') + " " + owner.get('lastName', '') for owner in team.owners]
         standings.append({
             "Team Name": team.team_name,
-            "Owner": ", ".join(team.owners),
+            "Owners": ", ".join(owners),  # Join owner names into a single string
             "Wins": team.wins,
             "Losses": team.losses,
             "Points For": team.points_for,
