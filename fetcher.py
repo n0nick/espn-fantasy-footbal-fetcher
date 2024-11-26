@@ -40,7 +40,7 @@ def fetch_rosters():
                 "Position": player.position,
                 "Team": player.proTeam,
                 "Status": player.injuryStatus,
-                "Projected Points": player.projected_points,
+                "Projected Points": player.projected_avg_points,
                 "Actual Points": player.points,
             })
     save_to_csv(rosters, 'rosters.csv')
@@ -71,7 +71,7 @@ def fetch_waiver_wire():
             "Position": player.position,
             "Team": player.proTeam,
             "Status": player.injuryStatus,
-            "Projected Points": player.projected_points,
+            "Projected Points": player.projected_avg_points,
             "Actual Points": player.points,
             "Ownership %": player.percent_owned,
         })
