@@ -89,17 +89,25 @@ def fetch_waiver_wire():
     return waiver_players
 
 # Fetch and save transaction history
+from datetime import datetime
+
 def fetch_transactions():
     transactions = []
     for transaction in league.recent_activity():
-        transactions.append({
-            "Type": transaction.type,
-            "Player Name": transaction.playerName,
-            "Team": transaction.proTeam,
-            "From Team": transaction.fromTeam,
-            "To Team": transaction.toTeam,
-            "Timestamp": datetime.fromtimestamp(transaction.date / 1000).strftime('%Y-%m-%d %H:%M:%S'),
-        })
+        for action in transaction.actions:
+            team = action[0]
+            action_type = action[1]
+            player = action[2]
+            transactions.append({
+                "Date": datetime.fromtimestamp(transaction.date / 1000).strftime('%Y-%m-%d %H:%M:%S'),
+                "Team Name": team.team_name,
+                "Action": action_type,
+                "Player Name": player.name if hasattr(player, 'name') else str(player),
+                "Waiver Rank": team.waiver_rank,
+                "Acquisitions": team.acquisitions,
+                "Drops": team.drops,
+                "Trades": team.trades,
+            })
     save_to_csv(transactions, 'transactions.csv')
     save_to_json(transactions, 'transactions.json')
     return transactions
