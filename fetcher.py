@@ -74,21 +74,37 @@ def fetch_rosters(league, output_format, output_dir):
 # Fetch and save player game logs
 def fetch_game_logs(league, output_format, output_dir):
     game_logs = []
+    max_weeks = league.settings.reg_season_count + league.settings.playoff_team_count
+
     for team in league.teams:
         for player in team.roster:
-            if player.stats:
-                for week, stats in player.stats.items():
-                    game_logs.append({
-                        "Team Name": team.team_name,
-                        "Player Name": player.name,
-                        "Week": week,
-                        "Points": stats.get('points', 0),
-                        "Projected Points": stats.get('projected_points', 0),
-                        "Receiving Yards": stats.get('breakdown', {}).get('receivingYards', 0),
-                        "Rushing Yards": stats.get('breakdown', {}).get('rushingYards', 0),
-                        "Touchdowns": stats.get('breakdown', {}).get('receivingTouchdowns', 0) + stats.get('breakdown', {}).get('rushingTouchdowns', 0),
-                    })
-    save_data(game_logs, 'player_game_logs', output_format, output_dir)
+            player_data = {
+                "Team Name": team.team_name,
+                "Player Name": player.name,
+                "Position": player.position,
+                "Team": player.proTeam,
+            }
+
+            # Process weekly data
+            for week in range(1, max_weeks + 1):
+                stats = player.stats.get(week, {})
+                opponent = stats.get("opponent", {}).get("teamAbbrev", "BYE")
+                home_or_away = "@" if stats.get("opponent", {}).get("isAway", False) else ""
+                points = stats.get("points", None)
+                projected_points = stats.get("projected_points", None)
+
+                # Add columns for each week
+                player_data[f"Opponent Week {week}"] = f"{home_or_away}{opponent}" if opponent != "BYE" else "BYE"
+                if points is not None:
+                    player_data[f"FPS Week {week}"] = points
+                elif projected_points is not None:
+                    player_data[f"FPS Week {week}"] = f"Proj {projected_points}"
+                else:
+                    player_data[f"FPS Week {week}"] = "N/A"
+
+            game_logs.append(player_data)
+
+    save_data(game_logs, 'game_logs', output_format, output_dir)
 
 # Fetch and save matchup schedule
 def fetch_matchup_schedule(league, output_format, output_dir):
