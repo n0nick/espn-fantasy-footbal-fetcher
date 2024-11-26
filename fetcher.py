@@ -36,14 +36,21 @@ def fetch_rosters():
     rosters = []
     for team in league.teams:
         for player in team.roster:
+            # Fetch actual points for the current week, if available
+            current_week = league.current_week
+            actual_points = player.stats.get(current_week, {}).get('points', 0)  # Defaults to 0 if no data
+
             rosters.append({
                 "Team Name": team.team_name,
                 "Player Name": player.name,
                 "Position": player.position,
+                "Lineup Slot": player.lineupSlot,
                 "Team": player.proTeam,
                 "Status": player.injuryStatus,
-                "Projected Points": player.projected_avg_points,
-                "Actual Points": player.points,
+                "Total Points (Season)": player.total_points,
+                "Average Points (Season)": player.avg_points,
+                "Projected Points (Week)": player.projected_avg_points,
+                "Actual Points (Week)": actual_points,  # New actual points data
             })
     save_to_csv(rosters, 'rosters.csv')
     save_to_json(rosters, 'rosters.json')
