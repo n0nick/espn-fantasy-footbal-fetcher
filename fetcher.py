@@ -18,7 +18,7 @@ def fetch_standings():
     for team in league.teams:
         standings.append({
             "Team Name": team.team_name,
-            "Owner": team.owner,
+            "Owner": ", ".join(team.owners),
             "Wins": team.wins,
             "Losses": team.losses,
             "Points For": team.points_for,
