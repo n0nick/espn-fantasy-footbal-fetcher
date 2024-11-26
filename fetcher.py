@@ -88,9 +88,28 @@ def fetch_waiver_wire():
     save_to_json(waiver_players, 'waiver_wire.json')
     return waiver_players
 
-# Fetch and save transaction history
-from datetime import datetime
+# Fetch and save matchup schedule
+def fetch_matchup_schedule():
+    matchup_schedule = []
+    # Use reg_season_count to determine the number of regular-season weeks
+    total_weeks = league.settings.reg_season_count
+    for week in range(1, total_weeks + 1):  # Loop through each week of the regular season
+        for matchup in league.scoreboard(week=week):
+            matchup_schedule.append({
+                "Week": week,
+                "Home Team": matchup.home_team.team_name if matchup.home_team else "BYE",
+                "Home Score": matchup.home_score if matchup.home_team else 0,
+                "Away Team": matchup.away_team.team_name if matchup.away_team else "BYE",
+                "Away Score": matchup.away_score if matchup.away_team else 0,
+                "Winner": (
+                    matchup.home_team.team_name if matchup.home_score > matchup.away_score else matchup.away_team.team_name
+                ) if matchup.home_team and matchup.away_team else "N/A",
+            })
+    save_to_csv(matchup_schedule, 'matchup_schedule.csv')
+    save_to_json(matchup_schedule, 'matchup_schedule.json')
+    return matchup_schedule
 
+# Fetch and save transaction history
 def fetch_transactions():
     transactions = []
     for transaction in league.recent_activity():
@@ -144,6 +163,9 @@ def main():
     
     print("Fetching transaction history...")
     fetch_transactions()
+
+    print("Fetching matchup schedule...")
+    fetch_matchup_schedule()
     
     print("Data saved! Check your directory for the output files.")
 
