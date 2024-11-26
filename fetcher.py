@@ -72,6 +72,7 @@ def fetch_rosters(league, output_format, output_dir):
     save_data(rosters, 'rosters', output_format, output_dir)
 
 # Fetch and save player game logs
+# TODO: This currently only returns 1 score and 1 projection per player. History TBD.
 def fetch_game_logs(league, output_format, output_dir):
     game_logs = []
     max_weeks = league.settings.reg_season_count + league.settings.playoff_team_count
